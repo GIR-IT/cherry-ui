@@ -180,8 +180,16 @@ export class GitHubClient {
       body: { base, head, commit_message: "cherry: temporary merge" },
     });
     if (response.status === 204) return null;
-    const raw = (await response.json()) as { sha: string; commit: RawGitCommit };
-    return toGitCommit({ ...raw.commit, sha: raw.sha });
+    // Unlike the git-data endpoints, this returns a REST "commit": parents at the top level,
+    // tree, message and author nested under `commit`.
+    const raw = (await response.json()) as RawRestCommit;
+    return {
+      sha: raw.sha,
+      treeSha: raw.commit.tree.sha,
+      parents: raw.parents.map((p) => p.sha),
+      message: raw.commit.message,
+      author: raw.commit.author,
+    };
   }
 
   async createPullRequest(
@@ -271,6 +279,12 @@ interface RawCommit {
 interface RawCompare {
   ahead_by: number;
   commits: RawCommit[];
+}
+
+interface RawRestCommit {
+  sha: string;
+  parents: { sha: string }[];
+  commit: { message: string; tree: { sha: string }; author: { name: string; email: string; date: string } };
 }
 
 interface RawGitCommit {

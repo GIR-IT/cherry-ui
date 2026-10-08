@@ -20,7 +20,7 @@
     "typecheck": "tsc -b",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "extension:zip": "cd extension && rm -f ../cherry-extension.zip && zip -qr ../cherry-extension.zip . -x '.*' -x 'README.md'"
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -42,6 +42,7 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
+    "vitest": "^5.0.3",
     "wrangler": "^4.148.0"
   }
 }

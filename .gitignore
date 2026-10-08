@@ -6,4 +6,3 @@ dist/
 *.log
 .claude/
 *.tsbuildinfo
-cherry-extension.zip

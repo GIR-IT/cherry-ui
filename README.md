@@ -20,10 +20,6 @@ Swap `github.com` for `cherry-ui.com`:
 - **Diffs** are rendered with [`@pierre/diffs`](https://diffs.com) `CodeView`, which is virtualized and syntax highlighted.
 - **Strict security headers** (CSP, HSTS, no framing) in `public/_headers`.
 
-## Chrome extension
-
-`extension/` adds a **Cherry-pick** button to GitHub repository headers and pull requests, plus a toolbar icon and <kbd>Alt+Shift+C</kbd> that open the current GitHub page in Cherry. Load it unpacked from `chrome://extensions`. See [extension/README.md](extension/README.md); publishing to the Chrome Web Store is described in [store/chrome/README.md](store/chrome/README.md).
-
 ## Develop
 
 ```bash
@@ -31,6 +27,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm run lint       # Biome
 npm run typecheck
+npm test           # cherry-pick flow against a fake GitHub API
 npm run build && npm run preview   # production build with real headers
 ```
 

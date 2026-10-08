@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**", "*.ts", "*.json", "*.jsonc", "public/*.webmanifest", "extension/**"]
+    "includes": ["src/**", "*.ts", "*.json", "*.jsonc", "public/*.webmanifest"]
   },
   "formatter": {
     "indentStyle": "space",
