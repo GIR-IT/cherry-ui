@@ -66,17 +66,19 @@ export class FakeGitHub {
     const body = init?.body ? JSON.parse(String(init.body)) : undefined;
     const path = url.pathname.replace(/^\/repos\/[^/]+\/[^/]+/, "");
 
-    let match: RegExpMatchArray | null;
+    const readRef = capture(path, /^\/git\/ref\/heads\/(.+)$/);
+    const writeRef = capture(path, /^\/git\/refs\/heads\/(.+)$/);
+    const commitSha = capture(path, /^\/git\/commits\/(\w+)$/);
 
     // GET /git/ref/heads/{branch}
-    if (method === "GET" && (match = path.match(/^\/git\/ref\/heads\/(.+)$/))) {
-      const sha = this.refs.get(decodeURIComponent(match[1]));
-      return sha ? json({ ref: `refs/heads/${match[1]}`, object: { sha, type: "commit" } }) : notFound();
+    if (method === "GET" && readRef) {
+      const sha = this.refs.get(readRef);
+      return sha ? json({ ref: `refs/heads/${readRef}`, object: { sha, type: "commit" } }) : notFound();
     }
 
     // GET /git/commits/{sha}: git-data commit (flat)
-    if (method === "GET" && (match = path.match(/^\/git\/commits\/(\w+)$/))) {
-      const commit = this.commits.get(match[1]);
+    if (method === "GET" && commitSha) {
+      const commit = this.commits.get(commitSha);
       return commit ? json(gitDataCommit(commit)) : notFound();
     }
 
@@ -97,8 +99,8 @@ export class FakeGitHub {
     }
 
     // PATCH /git/refs/heads/{branch}
-    if (method === "PATCH" && (match = path.match(/^\/git\/refs\/heads\/(.+)$/))) {
-      const name = decodeURIComponent(match[1]);
+    if (method === "PATCH" && writeRef) {
+      const name = writeRef;
       const current = this.refs.get(name);
       if (!current) return notFound();
       if (!body.force && !this.isAncestor(current, body.sha)) return error(422, "Update is not a fast forward");
@@ -107,8 +109,8 @@ export class FakeGitHub {
     }
 
     // DELETE /git/refs/heads/{branch}
-    if (method === "DELETE" && (match = path.match(/^\/git\/refs\/heads\/(.+)$/))) {
-      return this.refs.delete(decodeURIComponent(match[1])) ? new Response(null, { status: 204 }) : notFound();
+    if (method === "DELETE" && writeRef) {
+      return this.refs.delete(writeRef) ? new Response(null, { status: 204 }) : notFound();
     }
 
     // POST /merges: answers with a REST commit (parents top-level, data under `commit`)
@@ -188,6 +190,12 @@ export class FakeGitHub {
     }
     return result;
   }
+}
+
+/** The first capture group of `pattern` in `path`, URL-decoded. */
+function capture(path: string, pattern: RegExp): string | undefined {
+  const match = path.match(pattern);
+  return match ? decodeURIComponent(match[1]) : undefined;
 }
 
 function gitDataCommit(commit: StoredCommit) {
