@@ -3,17 +3,18 @@ import type { RepoRoute } from "../lib/route";
 import { RepoInput } from "./RepoInput";
 import { TokenButton } from "./TokenButton";
 import { Logo } from "./ui/Logo";
+import { ThemeToggle } from "./ui/ThemeToggle";
 
-const examples = [
-  "github.com/honojs/hono",
-  "github.com/oven-sh/bun",
-  "github.com/vitejs/vite/compare/v6...main",
-];
+const examples = ["github.com/honojs/hono", "github.com/oven-sh/bun", "github.com/vitejs/vite/compare/v6...main"];
 
 const steps = [
   { icon: ScanEye, title: "Browse", text: "Every commit on a branch, with a fast, virtualized diff viewer." },
   { icon: ListChecks, title: "Queue", text: "Tick the commits you need. Ones already in the target are flagged." },
-  { icon: GitPullRequestArrow, title: "Land", text: "Cherry-pick server-side into a pull request, or push straight to the branch." },
+  {
+    icon: GitPullRequestArrow,
+    title: "Land",
+    text: "Cherry-pick server-side into a pull request, or push straight to the branch.",
+  },
 ];
 
 export function Landing({ onOpen }: { onOpen(route: RepoRoute): void }) {
@@ -26,7 +27,10 @@ export function Landing({ onOpen }: { onOpen(route: RepoRoute): void }) {
           <Logo size={30} />
           <span className="text-[15px] font-semibold tracking-tight">Cherry</span>
         </div>
-        <TokenButton />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <TokenButton />
+        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 pb-24">
@@ -34,17 +38,22 @@ export function Landing({ onOpen }: { onOpen(route: RepoRoute): void }) {
           Cherry-pick on GitHub, <span className="text-cherry-600">right from your browser.</span>
         </h1>
         <p className="mt-4 text-lg text-zinc-500 text-pretty">
-          Pick commits from one branch, review their diffs, and land them on another, as a pull request or a direct push. No clone, no terminal.
+          Pick commits from one branch, review their diffs, and land them on another, as a pull request or a direct
+          push. No clone, no terminal.
         </p>
 
         <div className="mt-8 overflow-hidden rounded-xl bg-zinc-50 font-mono text-[13px] ring-1 ring-zinc-200 dark:bg-zinc-900/60 dark:ring-zinc-800">
           <div className="flex gap-3 bg-cherry-50/70 px-4 py-2 text-cherry-800 dark:bg-cherry-950/40 dark:text-cherry-300">
             <span className="select-none">-</span>
-            <span><b>github.com</b>/org/repo/compare/release...main</span>
+            <span>
+              <b>github.com</b>/org/repo/compare/release...main
+            </span>
           </div>
           <div className="flex gap-3 bg-emerald-50/70 px-4 py-2 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
             <span className="select-none">+</span>
-            <span><b>{host}</b>/org/repo/compare/release...main</span>
+            <span>
+              <b>{host}</b>/org/repo/compare/release...main
+            </span>
           </div>
         </div>
 

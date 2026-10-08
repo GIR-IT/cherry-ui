@@ -1,9 +1,13 @@
 import { clsx } from "clsx";
 import { CheckCircle2, CircleAlert, Info, X } from "lucide-react";
-import { type ReactNode, createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
 type ToastKind = "success" | "error" | "info";
-interface ToastItem { id: number; kind: ToastKind; message: ReactNode }
+interface ToastItem {
+  id: number;
+  kind: ToastKind;
+  message: ReactNode;
+}
 
 const ToastContext = createContext<(message: ReactNode, kind?: ToastKind) => void>(() => {});
 
@@ -41,7 +45,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               <Icon className={clsx("mt-px size-4 shrink-0", tones[toast.kind])} />
               <div className="min-w-0 flex-1 text-zinc-700 dark:text-zinc-200">{toast.message}</div>
-              <button type="button" onClick={() => dismiss(toast.id)} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200" aria-label="Dismiss">
+              <button
+                type="button"
+                onClick={() => dismiss(toast.id)}
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                aria-label="Dismiss"
+              >
                 <X className="size-4" />
               </button>
             </div>

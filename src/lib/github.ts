@@ -222,8 +222,11 @@ export class GitHubClient {
 }
 
 async function errorMessage(response: Response): Promise<string> {
-  if (response.status === 403 && response.headers.get("x-ratelimit-remaining") === "0")
-    return "GitHub rate limit reached. Add a token to raise the limit.";
+  if ((response.status === 403 || response.status === 429) && response.headers.get("x-ratelimit-remaining") === "0") {
+    const reset = Number(response.headers.get("x-ratelimit-reset")) * 1000;
+    const when = reset ? ` It resets at ${new Date(reset).toLocaleTimeString([], { timeStyle: "short" })}.` : "";
+    return `GitHub's rate limit for anonymous requests is used up.${when} Add a token for 5,000 requests an hour.`;
+  }
   try {
     const body = (await response.json()) as { message?: string };
     return body.message ?? response.statusText;

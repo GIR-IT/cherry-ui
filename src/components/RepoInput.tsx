@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ArrowRight, Search } from "lucide-react";
 import { useState } from "react";
-import { type RepoRoute, parseRepoInput } from "../lib/route";
+import { parseRepoInput, type RepoRoute } from "../lib/route";
 
 interface RepoInputProps {
   initial?: string;
@@ -23,7 +23,10 @@ export function RepoInput({ initial = "", onOpen, size = "md", autoFocus }: Repo
 
   return (
     <form
-      onSubmit={(e) => { e.preventDefault(); submit(); }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit();
+      }}
       className={clsx(
         "group flex items-center gap-2 bg-white ring-1 transition focus-within:ring-2 dark:bg-zinc-900",
         invalid ? "ring-cherry-400" : "ring-zinc-200 focus-within:ring-cherry-500 dark:ring-zinc-800",
@@ -34,10 +37,16 @@ export function RepoInput({ initial = "", onOpen, size = "md", autoFocus }: Repo
       <input
         autoFocus={autoFocus}
         value={value}
-        onChange={(e) => { setValue(e.target.value); setInvalid(false); }}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setInvalid(false);
+        }}
         placeholder={large ? "Paste a GitHub repo, branch or compare URL" : "owner/repo"}
         spellCheck={false}
-        className={clsx("min-w-0 flex-1 bg-transparent font-mono outline-none placeholder:font-sans placeholder:text-zinc-400", large ? "text-base" : "text-[13px]")}
+        className={clsx(
+          "min-w-0 flex-1 bg-transparent font-mono outline-none placeholder:font-sans placeholder:text-zinc-400",
+          large ? "text-base" : "text-[13px]",
+        )}
       />
       <button
         type="submit"

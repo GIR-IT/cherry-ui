@@ -22,9 +22,7 @@ export async function findAppliedCommits(
   ]);
 
   const notInTarget = new Set(missing.commits.map((c) => c.sha));
-  const pickedOrigins = new Set(
-    targetCommits.flatMap((c) => [...c.message.matchAll(ORIGIN_TRAILER)].map((m) => m[1])),
-  );
+  const pickedOrigins = new Set(targetCommits.flatMap((c) => [...c.message.matchAll(ORIGIN_TRAILER)].map((m) => m[1])));
 
   const applied = new Set<string>();
   for (const commit of sourceCommits) {

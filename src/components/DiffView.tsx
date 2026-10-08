@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import { Columns2, Copy, ExternalLink, Rows2 } from "lucide-react";
 import { useMemo } from "react";
 import { useCommitDiff } from "../hooks/github";
+import { useTheme } from "../hooks/theme";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { fullDate, plural } from "../lib/format";
 import type { Commit } from "../lib/github";
@@ -17,11 +18,16 @@ export function DiffView({ owner, repo, commit }: { owner: string; repo: string;
   const diff = useCommitDiff(owner, repo, commit?.sha);
   const [diffStyle, setDiffStyle] = useLocalStorage<DiffStyle>("cherry.diff-style", "unified");
   const toast = useToast();
+  const { resolved: theme } = useTheme();
 
   const { items, additions, deletions } = useMemo(() => summarize(diff.data, commit?.sha), [diff.data, commit?.sha]);
 
   if (!commit)
-    return <div className="flex h-full items-center justify-center text-sm text-zinc-400">Select a commit to see its changes</div>;
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+        Select a commit to see its changes
+      </div>
+    );
 
   const body = commit.message.slice(commit.subject.length).trim();
 
@@ -42,7 +48,9 @@ export function DiffView({ owner, repo, commit }: { owner: string; repo: string;
                 title={style === "split" ? "Side by side" : "Unified"}
                 className={clsx(
                   "flex size-7 items-center justify-center rounded-md transition",
-                  diffStyle === style ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-400 hover:text-zinc-700",
+                  diffStyle === style
+                    ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                    : "text-zinc-400 hover:text-zinc-700",
                 )}
               >
                 {style === "split" ? <Columns2 className="size-3.5" /> : <Rows2 className="size-3.5" />}
@@ -59,12 +67,20 @@ export function DiffView({ owner, repo, commit }: { owner: string; repo: string;
           <span>{fullDate(commit.date)}</span>
           <button
             type="button"
-            onClick={() => { void navigator.clipboard.writeText(commit.sha); toast("Commit SHA copied", "success"); }}
+            onClick={() => {
+              void navigator.clipboard.writeText(commit.sha);
+              toast("Commit SHA copied", "success");
+            }}
             className="flex items-center gap-1 rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-zinc-600 transition hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
           >
             {commit.shortSha} <Copy className="size-3" />
           </button>
-          <a href={commit.htmlUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-cherry-600">
+          <a
+            href={commit.htmlUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 hover:text-cherry-600"
+          >
             GitHub <ExternalLink className="size-3" />
           </a>
           {diff.data && (
@@ -84,13 +100,15 @@ export function DiffView({ owner, repo, commit }: { owner: string; repo: string;
           </div>
         )}
         {diff.isError && <div className="p-6 text-sm text-cherry-600">{diff.error.message}</div>}
-        {diff.data && items.length === 0 && <div className="p-6 text-sm text-zinc-400">This commit has no file changes.</div>}
+        {diff.data && items.length === 0 && (
+          <div className="p-6 text-sm text-zinc-400">This commit has no file changes.</div>
+        )}
         {items.length > 0 && (
           <CodeView
             key={commit.sha}
             items={items}
             className="scrollbar-thin h-full overflow-auto"
-            options={{ diffStyle, themeType: "system", stickyHeaders: true, overflow: "scroll" }}
+            options={{ diffStyle, themeType: theme, stickyHeaders: true, overflow: "scroll" }}
           />
         )}
       </div>

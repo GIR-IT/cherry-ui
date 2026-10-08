@@ -1,0 +1,13 @@
+{
+  "name": "Cherry",
+  "short_name": "Cherry",
+  "description": "Cherry-pick GitHub commits in your browser.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#e11d48",
+  "icons": [
+    { "src": "/icon.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

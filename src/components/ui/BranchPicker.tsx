@@ -14,7 +14,15 @@ interface BranchPickerProps {
 }
 
 /** Searchable branch selector with keyboard navigation. */
-export function BranchPicker({ branches, value, onChange, label, defaultBranch, disabled, className }: BranchPickerProps) {
+export function BranchPicker({
+  branches,
+  value,
+  onChange,
+  label,
+  defaultBranch,
+  disabled,
+  className,
+}: BranchPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -35,8 +43,6 @@ export function BranchPicker({ branches, value, onChange, label, defaultBranch, 
     document.addEventListener("pointerdown", close);
     return () => document.removeEventListener("pointerdown", close);
   }, [open]);
-
-  useEffect(() => setActive(0), [query]);
 
   useEffect(() => {
     listRef.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: "nearest" });
@@ -68,18 +74,29 @@ export function BranchPicker({ branches, value, onChange, label, defaultBranch, 
           <input
             autoFocus
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActive(0);
+            }}
             onKeyDown={(e) => {
-              if (e.key === "ArrowDown") { e.preventDefault(); setActive((i) => Math.min(i + 1, filtered.length - 1)); }
-              else if (e.key === "ArrowUp") { e.preventDefault(); setActive((i) => Math.max(i - 1, 0)); }
-              else if (e.key === "Enter") { e.preventDefault(); choose(filtered[active]); }
-              else if (e.key === "Escape") setOpen(false);
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActive((i) => Math.min(i + 1, filtered.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActive((i) => Math.max(i - 1, 0));
+              } else if (e.key === "Enter") {
+                e.preventDefault();
+                choose(filtered[active]);
+              } else if (e.key === "Escape") setOpen(false);
             }}
             placeholder="Find a branch…"
             className="w-full border-b border-zinc-100 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-zinc-400 dark:border-zinc-800"
           />
           <ul ref={listRef} className="scrollbar-thin max-h-72 overflow-y-auto p-1">
-            {filtered.length === 0 && <li className="px-3 py-6 text-center text-sm text-zinc-400">No branches match</li>}
+            {filtered.length === 0 && (
+              <li className="px-3 py-6 text-center text-sm text-zinc-400">No branches match</li>
+            )}
             {filtered.map((branch, index) => (
               <li key={branch.name} data-index={index}>
                 <button
@@ -93,7 +110,11 @@ export function BranchPicker({ branches, value, onChange, label, defaultBranch, 
                 >
                   <Check className={clsx("size-3.5 shrink-0 text-cherry-600", branch.name !== value && "invisible")} />
                   <span className="min-w-0 flex-1 truncate font-mono">{branch.name}</span>
-                  {branch.name === defaultBranch && <span className="rounded bg-zinc-100 px-1.5 py-px text-[10px] font-semibold text-zinc-500 dark:bg-zinc-800">default</span>}
+                  {branch.name === defaultBranch && (
+                    <span className="rounded bg-zinc-100 px-1.5 py-px text-[10px] font-semibold text-zinc-500 dark:bg-zinc-800">
+                      default
+                    </span>
+                  )}
                   {branch.isProtected && <Lock className="size-3 shrink-0 text-zinc-400" />}
                 </button>
               </li>

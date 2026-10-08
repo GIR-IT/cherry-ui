@@ -41,14 +41,19 @@ interface CommitRowProps {
   onToggle(sha: string, extendRange: boolean): void;
 }
 
-const CommitRow = memo(function CommitRow({ commit, isApplied, isQueued, isFocused, onFocus, onToggle }: CommitRowProps) {
+const CommitRow = memo(function CommitRow({
+  commit,
+  isApplied,
+  isQueued,
+  isFocused,
+  onFocus,
+  onToggle,
+}: CommitRowProps) {
   const isMerge = commit.parents.length > 1;
 
   return (
     <li data-sha={commit.sha}>
       <div
-        role="button"
-        tabIndex={-1}
         onClick={() => onFocus(commit.sha)}
         className={clsx(
           "group relative flex cursor-pointer items-start gap-3 rounded-lg py-2 pr-2.5 pl-2 transition-colors outline-none",
@@ -63,7 +68,10 @@ const CommitRow = memo(function CommitRow({ commit, isApplied, isQueued, isFocus
           disabled={isMerge}
           aria-label={isQueued ? "Remove from queue" : "Add to queue"}
           title={isMerge ? "Merge commits can't be cherry-picked" : "Queue (shift-click for a range)"}
-          onClick={(e) => { e.stopPropagation(); onToggle(commit.sha, e.shiftKey); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle(commit.sha, e.shiftKey);
+          }}
           className={clsx(
             "mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-[5px] ring-[1.5px] transition",
             isQueued
@@ -83,14 +91,21 @@ const CommitRow = memo(function CommitRow({ commit, isApplied, isQueued, isFocus
             <Avatar name={commit.authorName} src={commit.avatarUrl} size={14} />
             <span className="truncate">{commit.authorLogin ?? commit.authorName}</span>
             <span className="text-zinc-300 dark:text-zinc-700">·</span>
-            <span className="shrink-0" title={commit.date}>{timeAgo(commit.date)}</span>
+            <span className="shrink-0" title={commit.date}>
+              {timeAgo(commit.date)}
+            </span>
           </div>
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-1">
-          <code className="rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-800/80 dark:text-zinc-400">{commit.shortSha}</code>
+          <code className="rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-800/80 dark:text-zinc-400">
+            {commit.shortSha}
+          </code>
           {isApplied && (
-            <span className="flex items-center gap-0.5 text-[10.5px] font-medium text-emerald-600 dark:text-emerald-400" title="Already in the target branch">
+            <span
+              className="flex items-center gap-0.5 text-[10.5px] font-medium text-emerald-600 dark:text-emerald-400"
+              title="Already in the target branch"
+            >
               <CheckCheck className="size-3" /> in target
             </span>
           )}

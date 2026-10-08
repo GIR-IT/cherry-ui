@@ -1,4 +1,4 @@
-import { type Commit, GitHubClient, GitHubError } from "./github";
+import { type Commit, type GitCommit, type GitHubClient, GitHubError } from "./github";
 
 export type DeliveryMode = "pull-request" | "push";
 
@@ -77,7 +77,7 @@ export async function cherryPick(
       });
       await gh.updateBranch(owner, repo, workBranch, sibling.sha, true);
 
-      let merged;
+      let merged: GitCommit | null;
       try {
         merged = await gh.merge(owner, repo, workBranch, commit.sha);
       } catch (error) {

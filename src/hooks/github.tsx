@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type ReactNode, createContext, useContext, useMemo } from "react";
+import { createContext, type ReactNode, useContext, useMemo } from "react";
 import { findAppliedCommits } from "../lib/applied";
 import { type Commit, GitHubClient } from "../lib/github";
 import { useLocalStorage } from "./useLocalStorage";
