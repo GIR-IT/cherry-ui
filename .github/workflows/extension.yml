@@ -1,0 +1,44 @@
+name: Publish Chrome extension
+
+# Push a tag like `extension-v1.0.1` (matching extension/manifest.json) to upload and publish.
+on:
+  push:
+    tags: ["extension-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: chrome-web-store
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check the tag matches the manifest version
+        if: github.event_name == 'push'
+        run: |
+          manifest=$(jq -r .version extension/manifest.json)
+          tag="${GITHUB_REF_NAME#extension-v}"
+          if [ "$manifest" != "$tag" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match manifest version $manifest"
+            exit 1
+          fi
+
+      - name: Package
+        run: cd extension && zip -qr ../cherry-extension.zip . -x '.*' -x 'README.md'
+
+      - name: Upload and publish
+        run: npx --yes chrome-webstore-upload-cli@4 --source cherry-extension.zip
+        env:
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cherry-extension
+          path: cherry-extension.zip

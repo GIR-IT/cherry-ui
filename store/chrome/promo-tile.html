@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html, body { margin: 0; width: 440px; height: 280px; background: #0b0b0c; color: #ededef; overflow: hidden; }
+      body { font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif; display: flex; flex-direction: column; justify-content: center; padding: 0 36px; box-sizing: border-box; }
+      .brand { display: flex; align-items: center; gap: 12px; }
+      .brand span { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+      p { margin: 14px 0 0; font-size: 15px; line-height: 1.45; color: #a1a1aa; max-width: 330px; }
+      .url { margin-top: 22px; font: 12px/1.7 ui-monospace, "SF Mono", Menlo, monospace; color: #71717a; border-top: 1px solid #232327; border-bottom: 1px solid #232327; padding: 8px 0; }
+      .url b { font-weight: 400; color: #ededef; }
+      .del { background: rgba(249, 112, 102, 0.15); color: #a1a1aa; padding: 0 2px; border-radius: 2px; }
+      .add { background: rgba(63, 178, 122, 0.15); color: #ededef; padding: 0 2px; border-radius: 2px; }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <svg viewBox="0 0 16 16" width="34" height="34" fill="none" stroke="#ededef" stroke-width="1.5" stroke-linecap="round"><path d="M9 1.75C7.25 4 5.75 7 5 9.5M9 1.75c1.4 2 2.3 4.4 2.5 6.75"/><circle cx="4.75" cy="11.75" r="2.75" fill="#ededef" stroke="none"/><circle cx="11.5" cy="10.75" r="2.75" fill="#ff5c7a" stroke="none"/></svg>
+      <span>Cherry</span>
+    </div>
+    <p>Cherry-pick GitHub commits from your browser. No clone, no terminal.</p>
+    <div class="url">
+      <div>- <span class="del">github.com</span>/org/repo</div>
+      <div><b>+ <span class="add">cherry-ui.com</span>/org/repo</b></div>
+    </div>
+  </body>
+</html>

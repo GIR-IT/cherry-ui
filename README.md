@@ -22,7 +22,7 @@ Swap `github.com` for `cherry-ui.com`:
 
 ## Chrome extension
 
-`extension/` adds a **Cherry-pick** button to GitHub repository headers and pull requests, plus a toolbar icon and <kbd>Alt+Shift+C</kbd> that open the current GitHub page in Cherry. Load it unpacked from `chrome://extensions`. See [extension/README.md](extension/README.md).
+`extension/` adds a **Cherry-pick** button to GitHub repository headers and pull requests, plus a toolbar icon and <kbd>Alt+Shift+C</kbd> that open the current GitHub page in Cherry. Load it unpacked from `chrome://extensions`. See [extension/README.md](extension/README.md); publishing to the Chrome Web Store is described in [store/chrome/README.md](store/chrome/README.md).
 
 ## Develop
 
@@ -49,3 +49,7 @@ Deploys the `cherry-ui` Worker and attaches `cherry-ui.com` and `www.cherry-ui.c
 
 - Source and target must be branches of the same repository.
 - On a conflict, nothing is changed. Remove that commit from the queue, or pick it locally.
+
+## License
+
+[WTFPL](LICENSE). Do what you want with it.
