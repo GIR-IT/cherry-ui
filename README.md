@@ -1,52 +1,93 @@
 # Cherry
 
-Cherry-pick commits on GitHub from the browser, at [cherry-ui.com](https://cherry-ui.com).
+Cherry is a browser-based tool for cherry-picking GitHub commits between branches. Review diffs,
+select the changes you need, and open a pull request or push them to a target branch without a
+local clone.
 
-Replace `github.com` with `cherry-ui.com` in a repository or compare URL:
+[Open Cherry](https://cherry-ui.com)
 
-```
+## Features
+
+- Browse and filter commits by message, author, or SHA.
+- Review file diffs before selecting changes.
+- Queue multiple commits and apply them in chronological order.
+- Identify and optionally hide commits already present in the target branch.
+- Open a pull request or update the target branch with a fast-forward push.
+- Navigate commits with keyboard shortcuts and select ranges with Shift-click.
+
+## Usage
+
+1. Open [cherry-ui.com](https://cherry-ui.com) and enter a GitHub repository or compare URL.
+2. Choose the source and target branches.
+3. Review the diffs and queue the commits to apply.
+4. Add a GitHub token with access to the repository, then choose pull request or direct push.
+
+You can also replace `github.com` with `cherry-ui.com` in a repository or compare URL:
+
+```text
 github.com/org/repo/compare/release...main
 cherry-ui.com/org/repo/compare/release...main
 ```
 
-Pick commits from the source branch, check their diffs, and apply them to the target branch as a pull request or a direct push. `compare/A...B` uses `B` as the source and `A` as the target. `/org/repo?from=main&to=release` works as well.
+For `compare/A...B`, `B` is the source and `A` is the target. Query parameters are also supported:
+`https://cherry-ui.com/org/repo?from=main&to=release`.
+
+Use `j` / `k` or the arrow keys to move between commits, `x` or Space to toggle a commit in the
+queue, and Shift-click to select a range.
+
+## Authentication and privacy
+
+Public repositories can be browsed without a token. Private repositories and cherry-picking
+require a GitHub personal access token. Use a fine-grained token restricted to the repositories
+you need, with **Contents** and **Pull requests** set to read and write. Changes to
+`.github/workflows` also require **Workflows** write access.
+
+Cherry calls `api.github.com` directly from the browser. The token is stored in the browser's
+`localStorage` and sent only to GitHub's API. Use a trusted browser and remove the token through
+the token dialog when finished on a shared device. See the [privacy policy](https://cherry-ui.com/privacy.html)
+for details.
 
 ## How it works
 
-The app is static and runs on Cloudflare Workers. The browser calls `api.github.com` directly, with a personal access token stored in `localStorage`. The token needs Contents and Pull requests write access.
+Cherry uses GitHub's Git data and merge APIs to apply each commit's changes on a temporary branch.
+It preserves the original commit message and author, with an optional cherry-pick origin marker.
+Merge commits are applied relative to their first parent, equivalent to `git cherry-pick -m 1`.
 
-GitHub's API has no cherry-pick endpoint, so Cherry builds one from the merge endpoint. For a commit `C` with parent `P`, it creates a temporary commit that has the target's tree and `P` as its parent, then asks GitHub to merge `C` into it. The merge base is `P`, so the result is the target plus the changes in `C`. Cherry commits that tree on top of the target with the original message and author. Merge commits are applied against their first parent, the same as `git cherry-pick -m 1`. The target branch is only updated after every commit has applied. See `src/lib/cherryPick.ts`.
-
-A commit is marked as already in the target when it is reachable from the target, or when a commit on the target has its `(cherry picked from commit ...)` line.
-
-Diffs are rendered with [`@pierre/diffs`](https://diffs.com). Security headers are in `public/_headers`.
-
-## Development
-
-```bash
-npm install
-npm run dev          # http://localhost:5173
-npm run lint
-npm run typecheck
-npm test             # cherry-pick flow against a fake GitHub API
-npm run build && npm run preview
-```
-
-In the app, `j` and `k` move between commits, `x` queues one, and shift-click selects a range.
-
-## Deploy
-
-```bash
-npx wrangler login
-npm run deploy
-```
-
-This deploys the `cherry-ui` Worker with `cherry-ui.com` and `www.cherry-ui.com` as custom domains. The domain has to be in the Cloudflare account Wrangler is logged in to.
+The target branch is only updated after every selected commit applies successfully. Direct pushes
+are fast-forward only; pull-request mode keeps the changes on a separate branch for review.
+Commits that produce no changes are skipped. The implementation is in
+[`src/lib/cherryPick.ts`](src/lib/cherryPick.ts).
 
 ## Limitations
 
-- Source and target have to be branches of the same repository.
-- Conflicts can't be resolved in the browser. When one happens nothing is changed; remove that commit from the queue or pick it locally.
+- Source and target must be branches of the same repository.
+- Merge conflicts cannot be resolved in the browser. A conflict leaves the target branch unchanged;
+  remove the conflicting commit from the queue or resolve it locally.
+- Root commits cannot be cherry-picked.
+- Repository permissions and branch protection rules still apply.
+
+## Local development
+
+Use Node.js 22, matching CI, and npm.
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the local URL printed by Vite, normally `http://localhost:5173`.
+
+```sh
+npm run lint       # Biome checks
+npm run typecheck  # TypeScript checks
+npm test           # Cherry-pick tests against a fake GitHub API
+npm run build      # Production build
+npm run preview    # Preview the build locally
+```
+
+The application uses React, TypeScript, Vite, Tailwind CSS, and TanStack Query. Diffs are rendered
+with `@pierre/diffs`. UI components live in `src/components/`; GitHub access and cherry-pick logic
+live in `src/lib/`.
 
 ## License
 
