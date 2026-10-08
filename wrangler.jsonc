@@ -1,7 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "cherry",
+  "name": "cherry-ui",
   "compatibility_date": "2026-10-01",
+  // Custom domains: Wrangler attaches these (DNS + certificate) on deploy. The zone must be in this account.
+  "routes": [
+    { "pattern": "cherry-ui.com", "custom_domain": true },
+    { "pattern": "www.cherry-ui.com", "custom_domain": true }
+  ],
   // Static single-page app: every unknown path (e.g. /owner/repo) serves index.html.
   "assets": {
     "not_found_handling": "single-page-application"

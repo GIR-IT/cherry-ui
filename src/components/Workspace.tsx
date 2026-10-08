@@ -93,7 +93,6 @@ export function Workspace({ route, navigate }: WorkspaceProps) {
             ? visible.slice(Math.min(from, to), Math.max(from, to) + 1)
             : visible.filter((c) => c.sha === sha);
         for (const commit of range) {
-          if (commit.parents.length > 1) continue;
           if (shouldQueue) next.add(commit.sha);
           else next.delete(commit.sha);
         }

@@ -52,7 +52,7 @@ const CommitRow = memo(function CommitRow({
   onToggle,
 }: CommitRowProps) {
   const isMerge = commit.parents.length > 1;
-  const muted = (isApplied && !isQueued) || isMerge;
+  const muted = isApplied && !isQueued;
 
   return (
     <li data-sha={commit.sha}>
@@ -67,11 +67,7 @@ const CommitRow = memo(function CommitRow({
         )}
       >
         <span className="mt-[3px] flex size-3.5 shrink-0 items-center justify-center">
-          {isMerge ? (
-            <span className="text-ink-3" title="Merge commits can't be cherry-picked">
-              –
-            </span>
-          ) : isApplied && !isQueued ? (
+          {isApplied && !isQueued ? (
             <span className="font-mono text-xs text-ok" title={`Already in ${target}`}>
               ✓
             </span>
@@ -111,9 +107,7 @@ const CommitRow = memo(function CommitRow({
             <p className={clsx("min-w-0 flex-1 truncate font-medium", muted ? "text-ink-3" : "text-ink")}>
               {commit.subject}
             </p>
-            {isMerge ? (
-              <span className="shrink-0 text-xs text-ink-3">merge</span>
-            ) : isApplied && !isQueued ? (
+            {isApplied && !isQueued ? (
               <span className="shrink-0 text-xs text-ok">in {target}</span>
             ) : (
               <span className="shrink-0 font-mono text-xs text-ink-3">{commit.shortSha}</span>
@@ -121,6 +115,7 @@ const CommitRow = memo(function CommitRow({
           </div>
           <p className="truncate text-xs text-ink-3">
             {commit.authorLogin ?? commit.authorName} · {timeAgo(commit.date)}
+            {isMerge && <span title="Picked against its first parent (git cherry-pick -m 1)"> · merge</span>}
           </p>
         </div>
       </div>

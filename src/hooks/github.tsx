@@ -82,12 +82,12 @@ export function useAppliedCommits(
   });
 }
 
-export function useCommitDiff(owner: string, repo: string, sha: string | undefined) {
+export function useCommitDiff(owner: string, repo: string, commit: Commit | undefined) {
   const { client } = useGitHub();
   return useQuery({
-    queryKey: ["diff", owner, repo, sha],
-    enabled: Boolean(sha),
+    queryKey: ["diff", owner, repo, commit?.sha],
+    enabled: Boolean(commit),
     staleTime: Infinity,
-    queryFn: () => client.getCommitDiff(owner, repo, sha!),
+    queryFn: () => client.getCommitDiff(owner, repo, commit!),
   });
 }

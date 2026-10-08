@@ -12,7 +12,7 @@ import { ProgressBar } from "./ui/ProgressBar";
 type DiffStyle = "split" | "unified";
 
 export function DiffView({ owner, repo, commit }: { owner: string; repo: string; commit?: Commit }) {
-  const diff = useCommitDiff(owner, repo, commit?.sha);
+  const diff = useCommitDiff(owner, repo, commit);
   const [diffStyle, setDiffStyle] = useLocalStorage<DiffStyle>("cherry.diff-style", "unified");
   const [copied, setCopied] = useState(false);
 
@@ -34,6 +34,11 @@ export function DiffView({ owner, repo, commit }: { owner: string; repo: string;
       <div className="border-b border-line px-4 py-3">
         <h2 className="text-base leading-[22px] font-semibold tracking-[-0.01em]">{commit.subject}</h2>
         {body && <p className="mt-1 line-clamp-4 whitespace-pre-line text-ink-2">{body}</p>}
+        {commit.parents.length > 1 && (
+          <p className="mt-1 text-xs text-ink-3">
+            Merge commit. Showing its changes against the first parent, which is what a cherry-pick applies.
+          </p>
+        )}
 
         <div className="mt-2 flex items-center gap-4 font-mono text-xs text-ink-3">
           <button type="button" onClick={copySha} className="hover:text-ink" title="Copy full SHA">

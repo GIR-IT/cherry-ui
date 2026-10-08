@@ -117,9 +117,16 @@ export class GitHubClient {
     return { commits, aheadBy, isComplete: commits.length >= aheadBy };
   }
 
-  /** The commit as a unified diff, exactly like appending `.diff` on github.com. */
-  getCommitDiff(owner: string, repo: string, sha: string): Promise<string> {
-    return this.text(`/repos/${owner}/${repo}/commits/${sha}`, "application/vnd.github.diff");
+  /**
+   * The changes a cherry-pick of this commit applies, as a unified diff. For merge commits that is
+   * the diff against the first parent, which is also what `git cherry-pick -m 1` applies.
+   */
+  getCommitDiff(owner: string, repo: string, commit: Pick<Commit, "sha" | "parents">): Promise<string> {
+    const path =
+      commit.parents.length > 1
+        ? `/repos/${owner}/${repo}/compare/${commit.parents[0]}...${commit.sha}`
+        : `/repos/${owner}/${repo}/commits/${commit.sha}`;
+    return this.text(path, "application/vnd.github.diff");
   }
 
   async getGitCommit(owner: string, repo: string, sha: string): Promise<GitCommit> {

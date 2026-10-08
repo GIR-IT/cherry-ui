@@ -1,5 +1,8 @@
 import { type Commit, type GitCommit, type GitHubClient, GitHubError } from "./github";
 
+/** Merge commits are applied relative to this parent (git's `-m 1`). */
+const MAINLINE_PARENT = 0;
+
 export type DeliveryMode = "pull-request" | "push";
 
 export interface CherryPickRequest {
@@ -41,6 +44,10 @@ export class CherryPickConflictError extends Error {
  *      H's tree plus exactly C's changes, which is what `git cherry-pick` computes.
  *   3. Commit that tree on top of H with C's message and author, and advance H.
  *
+ * Merge commits are picked against their first parent, like `git cherry-pick -m 1`: P is the
+ * mainline parent, and since every common ancestor of the sibling goes through P, the merge base is
+ * P and the result is H plus everything the merge brought into the mainline.
+ *
  * Nothing touches the target branch until every commit applied cleanly.
  */
 export async function cherryPick(
@@ -52,8 +59,7 @@ export async function cherryPick(
   onProgress({ stage: "preparing" });
 
   for (const commit of commits)
-    if (commit.parents.length !== 1)
-      throw new Error(`“${commit.subject}” is a merge commit; only regular commits can be cherry-picked.`);
+    if (commit.parents.length === 0) throw new Error(`${commit.shortSha} is a root commit and has nothing to pick.`);
 
   let headSha = await gh.getBranchSha(owner, repo, targetBranch);
   let headTree = (await gh.getGitCommit(owner, repo, headSha)).treeSha;
@@ -73,7 +79,7 @@ export async function cherryPick(
       const sibling = await gh.createCommit(owner, repo, {
         message: "cherry: temporary sibling",
         tree: headTree,
-        parents: [original.parents[0]],
+        parents: [original.parents[MAINLINE_PARENT]],
       });
       await gh.updateBranch(owner, repo, workBranch, sibling.sha, true);
 
