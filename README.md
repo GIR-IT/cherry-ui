@@ -20,6 +20,10 @@ Swap `github.com` for `cherry-ui.com`:
 - **Diffs** are rendered with [`@pierre/diffs`](https://diffs.com) `CodeView`, which is virtualized and syntax highlighted.
 - **Strict security headers** (CSP, HSTS, no framing) in `public/_headers`.
 
+## Chrome extension
+
+`extension/` adds a **Cherry-pick** button to GitHub repository headers and pull requests, plus a toolbar icon and <kbd>Alt+Shift+C</kbd> that open the current GitHub page in Cherry. Load it unpacked from `chrome://extensions`. See [extension/README.md](extension/README.md).
+
 ## Develop
 
 ```bash
@@ -38,6 +42,8 @@ Keyboard: `j`/`k` move, `x` queue, shift-click a checkbox to queue a range.
 npx wrangler login
 npm run deploy
 ```
+
+Deploys the `cherry-ui` Worker and attaches `cherry-ui.com` and `www.cherry-ui.com` as custom domains (see `wrangler.jsonc`). The zone must be in the Cloudflare account Wrangler is logged in to.
 
 ## Limitations
 
