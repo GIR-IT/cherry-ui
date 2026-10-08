@@ -79,7 +79,7 @@ export function DiffView({ owner, repo, commit }: { owner: string; repo: string;
         {diff.isPending && (
           <>
             <ProgressBar />
-            <p className="p-4 font-mono text-xs text-ink-3">Loading diff…</p>
+            <p className="p-4 font-mono text-xs text-ink-3">Loading diff...</p>
           </>
         )}
         {diff.isError && (

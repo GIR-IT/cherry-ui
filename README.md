@@ -1,37 +1,38 @@
 # Cherry
 
-**[cherry-ui.com](https://cherry-ui.com)**: cherry-pick commits on GitHub from your browser: browse a branch, review diffs in a fast virtualized viewer, queue commits, and land them on another branch as a pull request or a direct push.
+Cherry-pick commits on GitHub from the browser, at [cherry-ui.com](https://cherry-ui.com).
 
-Swap `github.com` for `cherry-ui.com`:
+Replace `github.com` with `cherry-ui.com` in a repository or compare URL:
 
 ```
-- github.com/org/repo/compare/release...main
-+ cherry-ui.com/org/repo/compare/release...main
+github.com/org/repo/compare/release...main
+cherry-ui.com/org/repo/compare/release...main
 ```
 
-`compare/A...B` opens with `B` as the source and `A` as the target. `/org/repo?from=main&to=release` works too.
+Pick commits from the source branch, check their diffs, and apply them to the target branch as a pull request or a direct push. `compare/A...B` uses `B` as the source and `A` as the target. `/org/repo?from=main&to=release` works as well.
 
 ## How it works
 
-- **No backend.** A static React app on Cloudflare Workers. The browser talks to `api.github.com` directly.
-- **Your token stays local.** A fine-grained PAT (Contents + Pull requests: read & write) lives in `localStorage` and is only sent to GitHub.
-- **Cherry-pick without git.** For each commit `C` with parent `P`, Cherry creates a scratch commit with the target's tree and `P` as parent, then asks GitHub to merge `C` into it. That 3-way merge yields exactly *target + C's changes*, which is committed on top of the target with the original message and author. Merge commits are picked against their first parent, like `git cherry-pick -m 1`. The target branch is only touched once every commit applies cleanly. See `src/lib/cherryPick.ts`.
-- **"In target" detection.** A commit counts as applied when it's reachable from the target, or a target commit carries its `(cherry picked from commit …)` trailer.
-- **Diffs** are rendered with [`@pierre/diffs`](https://diffs.com) `CodeView`, which is virtualized and syntax highlighted.
-- **Strict security headers** (CSP, HSTS, no framing) in `public/_headers`.
+The app is static and runs on Cloudflare Workers. The browser calls `api.github.com` directly, with a personal access token stored in `localStorage`. The token needs Contents and Pull requests write access.
 
-## Develop
+GitHub's API has no cherry-pick endpoint, so Cherry builds one from the merge endpoint. For a commit `C` with parent `P`, it creates a temporary commit that has the target's tree and `P` as its parent, then asks GitHub to merge `C` into it. The merge base is `P`, so the result is the target plus the changes in `C`. Cherry commits that tree on top of the target with the original message and author. Merge commits are applied against their first parent, the same as `git cherry-pick -m 1`. The target branch is only updated after every commit has applied. See `src/lib/cherryPick.ts`.
+
+A commit is marked as already in the target when it is reachable from the target, or when a commit on the target has its `(cherry picked from commit ...)` line.
+
+Diffs are rendered with [`@pierre/diffs`](https://diffs.com). Security headers are in `public/_headers`.
+
+## Development
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm run lint       # Biome
+npm run dev          # http://localhost:5173
+npm run lint
 npm run typecheck
-npm test           # cherry-pick flow against a fake GitHub API
-npm run build && npm run preview   # production build with real headers
+npm test             # cherry-pick flow against a fake GitHub API
+npm run build && npm run preview
 ```
 
-Keyboard: `j`/`k` move, `x` queue, shift-click a checkbox to queue a range.
+In the app, `j` and `k` move between commits, `x` queues one, and shift-click selects a range.
 
 ## Deploy
 
@@ -40,13 +41,13 @@ npx wrangler login
 npm run deploy
 ```
 
-Deploys the `cherry-ui` Worker and attaches `cherry-ui.com` and `www.cherry-ui.com` as custom domains (see `wrangler.jsonc`). The zone must be in the Cloudflare account Wrangler is logged in to.
+This deploys the `cherry-ui` Worker with `cherry-ui.com` and `www.cherry-ui.com` as custom domains. The domain has to be in the Cloudflare account Wrangler is logged in to.
 
 ## Limitations
 
-- Source and target must be branches of the same repository.
-- On a conflict, nothing is changed. Remove that commit from the queue, or pick it locally.
+- Source and target have to be branches of the same repository.
+- Conflicts can't be resolved in the browser. When one happens nothing is changed; remove that commit from the queue or pick it locally.
 
 ## License
 
-[WTFPL](LICENSE). Do what you want with it.
+[WTFPL](LICENSE).

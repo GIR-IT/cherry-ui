@@ -4,7 +4,7 @@ interface State {
   error: Error | null;
 }
 
-/** Last line of defence: a readable message instead of a blank page. */
+/** Shows the error instead of a blank page when rendering fails. */
 export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
   state: State = { error: null };
 

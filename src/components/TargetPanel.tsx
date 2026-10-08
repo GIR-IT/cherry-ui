@@ -107,7 +107,7 @@ export function TargetPanel({
       ? "Your token can't push to this repo"
       : !target
         ? "Choose a target branch"
-        : `${source ?? "…"} → ${target}`;
+        : `${source ?? ""} → ${target}`;
 
   return (
     <aside className="flex h-full min-h-0 flex-col border-l border-line">
@@ -146,12 +146,11 @@ export function TargetPanel({
                     key={commit.sha}
                     className={clsx(
                       "group flex items-baseline gap-2 border-b border-line/60 py-1.5 pr-1.5 pl-3",
+                      active && "bg-hover",
                       conflicted && "shadow-[inset_2px_0_0_var(--color-err)]",
                     )}
                   >
-                    <span className="tabular w-4 shrink-0 font-mono text-xs text-accent">
-                      {active ? "…" : index + 1}
-                    </span>
+                    <span className="tabular w-4 shrink-0 font-mono text-xs text-accent">{index + 1}</span>
                     <button
                       type="button"
                       onClick={() => onFocus(commit.sha)}
@@ -208,7 +207,7 @@ export function TargetPanel({
             onChange={(e) => setRecordOrigin(e.target.checked)}
             className="size-3.5 accent-ink"
           />
-          Add “cherry picked from” line
+          Add "cherry picked from" line
         </label>
 
         <Button variant="primary" size="lg" className="w-full" disabled={!canPick} onClick={run}>

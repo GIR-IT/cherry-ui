@@ -31,12 +31,12 @@ export interface CherryPickResult {
 
 export class CherryPickConflictError extends Error {
   constructor(readonly commit: Commit) {
-    super(`“${commit.subject}” (${commit.shortSha}) conflicts with ${"the target branch"}.`);
+    super(`${commit.shortSha} (${commit.subject}) conflicts with the target branch.`);
   }
 }
 
 /**
- * Cherry-picks commits onto a branch using only the GitHub API — no local git.
+ * Cherry-picks commits onto a branch using only the GitHub API, without a local clone.
  *
  * For each commit C with parent P, on a scratch branch whose head is H:
  *   1. Create a "sibling" commit with H's tree but P as parent, and point the scratch branch at it.

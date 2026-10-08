@@ -39,8 +39,6 @@ export function useGitHub() {
   return context;
 }
 
-// ── Queries ──────────────────────────────────────────────────────────────
-
 export function useViewer() {
   const { client, token } = useGitHub();
   return useQuery({ queryKey: ["viewer", token], queryFn: () => client.getViewer(), enabled: Boolean(token) });

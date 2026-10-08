@@ -64,7 +64,7 @@ export function TokenDialog({ onClose }: { onClose(): void }) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && save()}
-          placeholder="github_pat_…"
+          placeholder="github_pat_..."
           aria-label="GitHub token"
           className="mt-4 h-8 w-full rounded border border-line-strong bg-transparent px-2.5 font-mono text-[13px] outline-none transition-colors focus:border-ink"
         />

@@ -226,7 +226,7 @@ export function Workspace({ route, navigate }: WorkspaceProps) {
             {commitPages.isPending || repo.isPending ? (
               <>
                 <ProgressBar />
-                <p className="p-3 font-mono text-xs text-ink-3">Loading commits…</p>
+                <p className="p-3 font-mono text-xs text-ink-3">Loading commits...</p>
               </>
             ) : commitPages.isError ? (
               <p className="p-3 text-err">{commitPages.error.message}</p>
@@ -243,7 +243,7 @@ export function Workspace({ route, navigate }: WorkspaceProps) {
                 />
                 {visible.length === 0 && (
                   <p className="p-3 text-ink-3">
-                    {search ? `No commits match “${search}”.` : "No commits to show."}{" "}
+                    {search ? `No commits match "${search}".` : "No commits to show."}{" "}
                     {search && (
                       <button
                         type="button"
@@ -262,7 +262,7 @@ export function Workspace({ route, navigate }: WorkspaceProps) {
                     disabled={commitPages.isFetchingNextPage}
                     className="h-8 w-full text-xs text-ink-2 hover:bg-hover hover:text-ink"
                   >
-                    {commitPages.isFetchingNextPage ? "Loading…" : "Load older commits"}
+                    {commitPages.isFetchingNextPage ? "Loading..." : "Load older commits"}
                   </button>
                 )}
               </>
@@ -272,7 +272,7 @@ export function Workspace({ route, navigate }: WorkspaceProps) {
           <div className="flex h-8 shrink-0 items-center gap-3 border-t border-line px-3 font-mono text-xs text-ink-3">
             <span className="tabular truncate">
               {applied.isFetching
-                ? `Checking ${target}…`
+                ? `Checking ${target}...`
                 : `${commits.length} commits${target && applied.data ? ` · ${appliedSet.size} in ${target}` : ""}`}
             </span>
             <span className="ml-auto shrink-0">
@@ -283,7 +283,7 @@ export function Workspace({ route, navigate }: WorkspaceProps) {
 
         {/* Diff */}
         <section aria-label="Diff" className="min-h-0 min-w-0">
-          <Suspense fallback={<p className="p-4 font-mono text-xs text-ink-3">Loading diff…</p>}>
+          <Suspense fallback={<p className="p-4 font-mono text-xs text-ink-3">Loading diff...</p>}>
             <DiffView owner={owner} repo={repoName} commit={focusedCommit} />
           </Suspense>
         </section>

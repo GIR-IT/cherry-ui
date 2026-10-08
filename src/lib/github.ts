@@ -65,8 +65,6 @@ export class GitHubClient {
     return Boolean(this.token);
   }
 
-  // ── Reading ────────────────────────────────────────────────────────────
-
   async getViewer(): Promise<Viewer> {
     const user = await this.json<{ login: string; avatar_url: string }>("/user");
     return { login: user.login, avatarUrl: user.avatar_url };
@@ -141,8 +139,6 @@ export class GitHubClient {
     return ref.object.sha;
   }
 
-  // ── Writing ────────────────────────────────────────────────────────────
-
   async createCommit(
     owner: string,
     repo: string,
@@ -204,8 +200,6 @@ export class GitHubClient {
     return { number: raw.number, htmlUrl: raw.html_url };
   }
 
-  // ── Plumbing ───────────────────────────────────────────────────────────
-
   private async json<T>(path: string, options: RequestOptions = {}): Promise<T> {
     const response = await this.request(path, options);
     return (await response.json()) as T;
@@ -249,8 +243,6 @@ async function errorMessage(response: Response): Promise<string> {
     return response.statusText;
   }
 }
-
-// ── Raw API shapes ─────────────────────────────────────────────────────
 
 interface RawRepo {
   name: string;
