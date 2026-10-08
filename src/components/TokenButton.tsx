@@ -1,4 +1,3 @@
-import { KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useGitHub, useViewer } from "../hooks/github";
 import { TokenDialog } from "./TokenDialog";
@@ -13,18 +12,12 @@ export function TokenButton() {
   return (
     <>
       {token && viewer.data ? (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="flex h-9 items-center gap-2 rounded-lg px-2 text-sm text-zinc-600 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          title="GitHub token"
-        >
-          <Avatar name={viewer.data.login} src={viewer.data.avatarUrl} size={22} />
-          <span className="font-medium">{viewer.data.login}</span>
-        </button>
+        <Button variant="ghost" onClick={() => setOpen(true)} title="GitHub token">
+          <Avatar name={viewer.data.login} src={viewer.data.avatarUrl} />
+          <span className="text-ink">{viewer.data.login}</span>
+        </Button>
       ) : (
-        <Button variant={token && viewer.isError ? "danger" : "secondary"} onClick={() => setOpen(true)}>
-          <KeyRound className="size-3.5" />
+        <Button variant={token && viewer.isError ? "danger" : "ghost"} onClick={() => setOpen(true)}>
           {token && viewer.isError ? "Token invalid" : "Add token"}
         </Button>
       )}

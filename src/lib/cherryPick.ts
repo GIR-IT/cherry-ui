@@ -143,7 +143,11 @@ function pullRequestTitle(commits: Commit[], target: string) {
 }
 
 function pullRequestBody(applied: Commit[], skipped: Commit[]) {
-  const lines = ["Cherry-picked with 🍒 Cherry:", "", ...applied.map((c) => `- ${c.sha} ${c.subject}`)];
+  const lines = [
+    "Cherry-picked with [Cherry](https://cherry-ui.com):",
+    "",
+    ...applied.map((c) => `- ${c.sha} ${c.subject}`),
+  ];
   if (skipped.length > 0)
     lines.push("", "Skipped (already applied):", ...skipped.map((c) => `- ${c.sha} ${c.subject}`));
   return lines.join("\n");

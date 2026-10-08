@@ -1,22 +1,21 @@
 import { clsx } from "clsx";
-import { Check, CheckCheck } from "lucide-react";
 import { memo } from "react";
 import { timeAgo } from "../lib/format";
 import type { Commit } from "../lib/github";
-import { Avatar } from "./ui/Avatar";
 
 interface CommitListProps {
   commits: Commit[];
   applied: Set<string>;
   queued: Set<string>;
   focused?: string;
+  target?: string;
   onFocus(sha: string): void;
   onToggle(sha: string, extendRange: boolean): void;
 }
 
-export function CommitList({ commits, applied, queued, focused, onFocus, onToggle }: CommitListProps) {
+export function CommitList({ commits, applied, queued, focused, target, onFocus, onToggle }: CommitListProps) {
   return (
-    <ul className="space-y-px px-2 pb-3">
+    <ul>
       {commits.map((commit) => (
         <CommitRow
           key={commit.sha}
@@ -24,6 +23,7 @@ export function CommitList({ commits, applied, queued, focused, onFocus, onToggl
           isApplied={applied.has(commit.sha)}
           isQueued={queued.has(commit.sha)}
           isFocused={focused === commit.sha}
+          target={target}
           onFocus={onFocus}
           onToggle={onToggle}
         />
@@ -37,6 +37,7 @@ interface CommitRowProps {
   isApplied: boolean;
   isQueued: boolean;
   isFocused: boolean;
+  target?: string;
   onFocus(sha: string): void;
   onToggle(sha: string, extendRange: boolean): void;
 }
@@ -46,70 +47,81 @@ const CommitRow = memo(function CommitRow({
   isApplied,
   isQueued,
   isFocused,
+  target,
   onFocus,
   onToggle,
 }: CommitRowProps) {
   const isMerge = commit.parents.length > 1;
+  const muted = (isApplied && !isQueued) || isMerge;
 
   return (
     <li data-sha={commit.sha}>
       <div
         onClick={() => onFocus(commit.sha)}
         className={clsx(
-          "group relative flex cursor-pointer items-start gap-3 rounded-lg py-2 pr-2.5 pl-2 transition-colors outline-none",
-          isFocused ? "bg-zinc-100 dark:bg-zinc-800/80" : "hover:bg-zinc-50 dark:hover:bg-zinc-900",
-          isQueued && !isFocused && "bg-cherry-50/60 dark:bg-cherry-950/25",
+          "flex cursor-default items-start gap-3 border-b border-line/60 py-2 pr-3 pl-3",
+          isFocused ? "bg-selected" : isQueued ? "bg-accent-wash" : "hover:bg-hover",
+          isQueued
+            ? "shadow-[inset_2px_0_0_var(--color-accent)]"
+            : isFocused && "shadow-[inset_2px_0_0_var(--color-ink)]",
         )}
       >
-        {isFocused && <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-cherry-500" />}
-
-        <button
-          type="button"
-          disabled={isMerge}
-          aria-label={isQueued ? "Remove from queue" : "Add to queue"}
-          title={isMerge ? "Merge commits can't be cherry-picked" : "Queue (shift-click for a range)"}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle(commit.sha, e.shiftKey);
-          }}
-          className={clsx(
-            "mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-[5px] ring-[1.5px] transition",
-            isQueued
-              ? "bg-cherry-600 ring-cherry-600 text-white"
-              : isApplied
-                ? "bg-emerald-500/90 ring-emerald-500/90 text-white"
-                : "ring-zinc-300 hover:ring-cherry-400 dark:ring-zinc-700",
-            isMerge && "cursor-not-allowed opacity-30",
-          )}
-        >
-          {(isQueued || isApplied) && <Check className="size-3" strokeWidth={3} />}
-        </button>
-
-        <div className={clsx("min-w-0 flex-1", isApplied && !isQueued && "opacity-55")}>
-          <p className="truncate text-[13.5px] leading-5 font-medium">{commit.subject}</p>
-          <div className="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-500">
-            <Avatar name={commit.authorName} src={commit.avatarUrl} size={14} />
-            <span className="truncate">{commit.authorLogin ?? commit.authorName}</span>
-            <span className="text-zinc-300 dark:text-zinc-700">·</span>
-            <span className="shrink-0" title={commit.date}>
-              {timeAgo(commit.date)}
+        <span className="mt-[3px] flex size-3.5 shrink-0 items-center justify-center">
+          {isMerge ? (
+            <span className="text-ink-3" title="Merge commits can't be cherry-picked">
+              –
             </span>
-          </div>
-        </div>
-
-        <div className="flex shrink-0 flex-col items-end gap-1">
-          <code className="rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-[11px] text-zinc-500 dark:bg-zinc-800/80 dark:text-zinc-400">
-            {commit.shortSha}
-          </code>
-          {isApplied && (
-            <span
-              className="flex items-center gap-0.5 text-[10.5px] font-medium text-emerald-600 dark:text-emerald-400"
-              title="Already in the target branch"
+          ) : isApplied && !isQueued ? (
+            <span className="font-mono text-xs text-ok" title={`Already in ${target}`}>
+              ✓
+            </span>
+          ) : (
+            <button
+              type="button"
+              aria-label={isQueued ? "Remove from queue" : "Add to queue"}
+              aria-pressed={isQueued}
+              title="Queue (shift-click for a range)"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle(commit.sha, e.shiftKey);
+              }}
+              className={clsx(
+                "flex size-3.5 items-center justify-center rounded-[3px] border transition-colors",
+                isQueued ? "border-accent bg-accent text-on-accent" : "border-line-strong hover:border-ink-3",
+              )}
             >
-              <CheckCheck className="size-3" /> in target
-            </span>
+              {isQueued && (
+                <svg
+                  viewBox="0 0 10 10"
+                  className="size-2.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  aria-hidden="true"
+                >
+                  <path d="M2 5.2 4.1 7.3 8 2.8" />
+                </svg>
+              )}
+            </button>
           )}
-          {isMerge && <span className="text-[10.5px] text-zinc-400">merge</span>}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-3">
+            <p className={clsx("min-w-0 flex-1 truncate font-medium", muted ? "text-ink-3" : "text-ink")}>
+              {commit.subject}
+            </p>
+            {isMerge ? (
+              <span className="shrink-0 text-xs text-ink-3">merge</span>
+            ) : isApplied && !isQueued ? (
+              <span className="shrink-0 text-xs text-ok">in {target}</span>
+            ) : (
+              <span className="shrink-0 font-mono text-xs text-ink-3">{commit.shortSha}</span>
+            )}
+          </div>
+          <p className="truncate text-xs text-ink-3">
+            {commit.authorLogin ?? commit.authorName} · {timeAgo(commit.date)}
+          </p>
         </div>
       </div>
     </li>

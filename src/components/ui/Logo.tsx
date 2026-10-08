@@ -1,25 +1,29 @@
-export function Logo({ size = 28 }: { size?: number }) {
+/** Two cherries on one stem: two commits from a common parent, one of them picked. */
+export function Mark({ size = 16 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden="true">
-      <defs>
-        <linearGradient id="cherry-logo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fb7185" />
-          <stop offset="1" stopColor="#be123c" />
-        </linearGradient>
-      </defs>
-      <rect width="34" height="34" rx="10" fill="url(#cherry-logo)" />
-      <g transform="translate(7 7) scale(0.8333)">
-        <path
-          d="M7.5,15 C8.5,10 11,6 15.5,3.5 M16.5,13 C16.5,9.5 16,6 15.5,3.5"
-          stroke="#fff"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path d="M15.5,3.5 C17.5,1.8 20.5,2 22,3.5 C20,5.2 17.5,5.2 15.5,3.5 Z" fill="#ffe4e6" />
-        <circle cx="7.25" cy="18.25" r="4.75" fill="#fff" />
-        <circle cx="16.75" cy="16.25" r="4.75" fill="#fff" fillOpacity="0.85" />
-      </g>
+    <svg
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      aria-hidden="true"
+      className="shrink-0 text-ink"
+    >
+      <path d="M9 1.75C7.25 4 5.75 7 5 9.5M9 1.75c1.4 2 2.3 4.4 2.5 6.75" />
+      <circle cx="4.75" cy="11.75" r="2.75" fill="currentColor" stroke="none" />
+      <circle cx="11.5" cy="10.75" r="2.75" fill="var(--color-accent)" stroke="none" />
     </svg>
+  );
+}
+
+export function Wordmark() {
+  return (
+    <span className="flex items-center gap-2">
+      <Mark />
+      <span className="text-[13px] font-semibold tracking-[-0.01em]">Cherry</span>
+    </span>
   );
 }

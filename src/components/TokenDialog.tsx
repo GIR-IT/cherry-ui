@@ -1,5 +1,4 @@
-import { ExternalLink, KeyRound, ShieldCheck, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGitHub } from "../hooks/github";
 import { Button } from "./ui/Button";
 
@@ -7,9 +6,17 @@ const FINE_GRAINED_URL =
   "https://github.com/settings/personal-access-tokens/new?name=Cherry&description=Cherry-pick+commits+and+open+pull+requests&expires_in=90&contents=write&pull_requests=write";
 const CLASSIC_URL = "https://github.com/settings/tokens/new?description=Cherry&scopes=repo&default_expires_at=90";
 
+const link = "text-ink underline underline-offset-2 hover:text-accent";
+
 export function TokenDialog({ onClose }: { onClose(): void }) {
   const { token, setToken } = useGitHub();
   const [value, setValue] = useState(token ?? "");
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   function save() {
     setToken(value);
@@ -18,57 +25,37 @@ export function TokenDialog({ onClose }: { onClose(): void }) {
 
   return (
     <div
-      className="fixed inset-0 z-40 flex animate-fade-in items-center justify-center bg-zinc-950/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-40 flex animate-fade-in items-start justify-center bg-black/50 px-4 pt-[18vh]"
       onPointerDown={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="token-title"
         onPointerDown={(e) => e.stopPropagation()}
-        className="w-full max-w-lg animate-slide-up rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
+        className="w-full max-w-[440px] rounded-md border border-line-strong bg-panel p-5"
       >
-        <div className="mb-5 flex items-start gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-cherry-50 text-cherry-600 dark:bg-cherry-950/60 dark:text-cherry-400">
-            <KeyRound className="size-5" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-base font-semibold">GitHub access</h2>
-            <p className="mt-0.5 text-sm text-zinc-500">
-              Needed for private repos and to cherry-pick. Public repos can be browsed without it.
-            </p>
-          </div>
-          <button type="button" onClick={onClose} className="text-zinc-400 hover:text-zinc-600" aria-label="Close">
-            <X className="size-5" />
-          </button>
-        </div>
+        <h2 id="token-title" className="text-base font-semibold tracking-[-0.01em]">
+          GitHub token
+        </h2>
+        <p className="mt-1 text-ink-2">
+          Needed for private repos and for cherry-picking. Public repos can be browsed without one.
+        </p>
 
-        <ol className="mb-5 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
-          <li className="flex gap-2">
-            <span className="font-mono text-cherry-600">1</span>
-            <span>
-              <a
-                href={FINE_GRAINED_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 font-medium text-cherry-600 underline-offset-2 hover:underline"
-              >
-                Create a fine-grained token <ExternalLink className="size-3" />
-              </a>{" "}
-              with <b>Contents</b> and <b>Pull requests</b> set to read &amp; write, or a{" "}
-              <a
-                href={CLASSIC_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="text-cherry-600 underline-offset-2 hover:underline"
-              >
-                classic token
-              </a>{" "}
-              with <code className="font-mono text-xs">repo</code> scope. Picking commits that touch{" "}
-              <code className="font-mono text-xs">.github/workflows</code> also needs <b>Workflows</b> write access.
-            </span>
+        <ol className="mt-4 list-decimal space-y-1.5 pl-4 text-ink-2 marker:text-ink-3">
+          <li>
+            Create a{" "}
+            <a href={FINE_GRAINED_URL} target="_blank" rel="noreferrer" className={link}>
+              fine-grained token
+            </a>{" "}
+            with Contents and Pull requests set to read &amp; write, or a{" "}
+            <a href={CLASSIC_URL} target="_blank" rel="noreferrer" className={link}>
+              classic token
+            </a>{" "}
+            with <code className="font-mono text-xs">repo</code> scope. Commits touching{" "}
+            <code className="font-mono text-xs">.github/workflows</code> also need Workflows write.
           </li>
-          <li className="flex gap-2">
-            <span className="font-mono text-cherry-600">2</span>
-            <span>Paste it below.</span>
-          </li>
+          <li>Paste it here.</li>
         </ol>
 
         <input
@@ -78,16 +65,13 @@ export function TokenDialog({ onClose }: { onClose(): void }) {
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && save()}
           placeholder="github_pat_…"
-          className="h-10 w-full rounded-lg bg-zinc-50 px-3 font-mono text-sm ring-1 ring-zinc-200 outline-none focus:ring-2 focus:ring-cherry-500 dark:bg-zinc-950 dark:ring-zinc-800"
+          aria-label="GitHub token"
+          className="mt-4 h-8 w-full rounded border border-line-strong bg-transparent px-2.5 font-mono text-[13px] outline-none transition-colors focus:border-ink"
         />
+        <p className="mt-2 text-xs text-ink-3">Stored in this browser's localStorage. Sent only to api.github.com.</p>
 
-        <p className="mt-3 flex items-center gap-1.5 text-xs text-zinc-500">
-          <ShieldCheck className="size-3.5 text-emerald-500" />
-          Stored only in this browser's localStorage and sent only to api.github.com.
-        </p>
-
-        <div className="mt-6 flex justify-between gap-2">
-          {token ? (
+        <div className="mt-5 flex items-center gap-2">
+          {token && (
             <Button
               variant="danger"
               onClick={() => {
@@ -97,17 +81,13 @@ export function TokenDialog({ onClose }: { onClose(): void }) {
             >
               Remove token
             </Button>
-          ) : (
-            <span />
           )}
-          <div className="flex gap-2">
-            <Button variant="ghost" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={save} disabled={!value.trim()}>
-              Save token
-            </Button>
-          </div>
+          <Button variant="ghost" className="ml-auto" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={save} disabled={!value.trim()}>
+            Save token
+          </Button>
         </div>
       </div>
     </div>

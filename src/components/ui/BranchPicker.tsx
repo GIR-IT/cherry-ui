@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { Check, ChevronsUpDown, GitBranch, Lock } from "lucide-react";
+import { ChevronDown, Lock } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Branch } from "../../lib/github";
 
@@ -60,17 +60,18 @@ export function BranchPicker({
       <button
         type="button"
         disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="group flex h-9 w-full items-center gap-2 rounded-lg bg-white px-3 text-left text-sm ring-1 ring-zinc-200 transition hover:ring-zinc-300 disabled:opacity-50 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:ring-zinc-700"
+        className="flex h-7 w-full items-center gap-2 rounded border border-line-strong px-2 text-left transition-colors hover:bg-hover disabled:opacity-50"
       >
-        <GitBranch className="size-3.5 shrink-0 text-zinc-400" />
-        <span className="shrink-0 text-xs text-zinc-400">{label}</span>
-        <span className="min-w-0 flex-1 truncate font-mono text-[13px] font-medium">{value ?? "Choose branch"}</span>
-        <ChevronsUpDown className="size-3.5 shrink-0 text-zinc-400" />
+        <span className="shrink-0 text-xs text-ink-3">{label}</span>
+        <span className="min-w-0 flex-1 truncate font-mono text-[12.5px] font-medium">{value ?? "choose branch"}</span>
+        <ChevronDown className="size-3 shrink-0 text-ink-3" strokeWidth={1.5} />
       </button>
 
       {open && (
-        <div className="absolute top-full right-0 left-0 z-30 mt-1.5 min-w-64 animate-fade-in overflow-hidden rounded-xl bg-white shadow-xl ring-1 shadow-zinc-900/10 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+        <div className="absolute top-full right-0 left-0 z-30 mt-1 min-w-64 animate-fade-in overflow-hidden rounded border border-line-strong bg-panel">
           <input
             autoFocus
             value={query}
@@ -90,13 +91,11 @@ export function BranchPicker({
                 choose(filtered[active]);
               } else if (e.key === "Escape") setOpen(false);
             }}
-            placeholder="Find a branch…"
-            className="w-full border-b border-zinc-100 bg-transparent px-3 py-2.5 text-sm outline-none placeholder:text-zinc-400 dark:border-zinc-800"
+            placeholder="Filter branches"
+            className="h-8 w-full border-b border-line bg-transparent px-2 font-mono text-[12.5px] outline-none"
           />
-          <ul ref={listRef} className="scrollbar-thin max-h-72 overflow-y-auto p-1">
-            {filtered.length === 0 && (
-              <li className="px-3 py-6 text-center text-sm text-zinc-400">No branches match</li>
-            )}
+          <ul ref={listRef} className="scrollbar-thin max-h-72 overflow-y-auto py-1">
+            {filtered.length === 0 && <li className="px-2 py-2 text-xs text-ink-3">No branches match</li>}
             {filtered.map((branch, index) => (
               <li key={branch.name} data-index={index}>
                 <button
@@ -104,18 +103,14 @@ export function BranchPicker({
                   onMouseEnter={() => setActive(index)}
                   onClick={() => choose(branch)}
                   className={clsx(
-                    "flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px]",
-                    index === active && "bg-zinc-100 dark:bg-zinc-800",
+                    "flex h-7 w-full items-center gap-2 px-2 text-left font-mono text-[12.5px]",
+                    index === active && "bg-selected",
                   )}
                 >
-                  <Check className={clsx("size-3.5 shrink-0 text-cherry-600", branch.name !== value && "invisible")} />
-                  <span className="min-w-0 flex-1 truncate font-mono">{branch.name}</span>
-                  {branch.name === defaultBranch && (
-                    <span className="rounded bg-zinc-100 px-1.5 py-px text-[10px] font-semibold text-zinc-500 dark:bg-zinc-800">
-                      default
-                    </span>
-                  )}
-                  {branch.isProtected && <Lock className="size-3 shrink-0 text-zinc-400" />}
+                  <span className="w-3 shrink-0 text-ink-2">{branch.name === value ? "✓" : ""}</span>
+                  <span className="min-w-0 flex-1 truncate">{branch.name}</span>
+                  {branch.name === defaultBranch && <span className="font-sans text-xs text-ink-3">default</span>}
+                  {branch.isProtected && <Lock className="size-3 shrink-0 text-ink-3" strokeWidth={1.5} />}
                 </button>
               </li>
             ))}

@@ -5,7 +5,6 @@ import { App } from "./App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastProvider } from "./components/ui/Toast";
 import { GitHubProvider } from "./hooks/github";
-import { ThemeProvider } from "./hooks/theme";
 import { GitHubError } from "./lib/github";
 import "./index.css";
 
@@ -23,15 +22,13 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <GitHubProvider>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
-          </GitHubProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <GitHubProvider>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </GitHubProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>,
 );

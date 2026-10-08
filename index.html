@@ -1,14 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark" style="color-scheme: dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0b0b0c" />
     <title>Cherry — cherry-pick GitHub commits in your browser</title>
     <meta name="description" content="Browse a branch, review diffs, and cherry-pick commits into another branch as a pull request or a direct push. No clone, no terminal." />
     <link rel="canonical" href="https://cherry-ui.com/" />
-    <link rel="icon" type="image/png" href="/icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon.png" />
     <link rel="apple-touch-icon" href="/icon-512.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta property="og:type" content="website" />
@@ -18,8 +19,6 @@
     <meta property="og:url" content="https://cherry-ui.com/" />
     <meta property="og:image" content="https://cherry-ui.com/icon-512.png" />
     <meta name="twitter:card" content="summary" />
-    <!-- Applies the saved theme before first paint. Keep in sync with src/hooks/theme.tsx; its hash is in public/_headers. -->
-    <script>(function(){try{var p=JSON.parse(localStorage.getItem("cherry.theme")||"\"system\"");var d=p==="dark"||(p!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;r.classList.toggle("dark",d);r.style.colorScheme=d?"dark":"light";}catch(e){}})();</script>
   </head>
   <body>
     <noscript>Cherry needs JavaScript to talk to the GitHub API.</noscript>

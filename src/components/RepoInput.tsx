@@ -1,19 +1,19 @@
 import { clsx } from "clsx";
-import { ArrowRight, Search } from "lucide-react";
 import { useState } from "react";
 import { parseRepoInput, type RepoRoute } from "../lib/route";
+import { Button } from "./ui/Button";
 
 interface RepoInputProps {
   initial?: string;
   onOpen(route: RepoRoute): void;
-  size?: "md" | "lg";
+  onCancel?(): void;
   autoFocus?: boolean;
+  className?: string;
 }
 
-export function RepoInput({ initial = "", onOpen, size = "md", autoFocus }: RepoInputProps) {
+export function RepoInput({ initial = "", onOpen, onCancel, autoFocus, className }: RepoInputProps) {
   const [value, setValue] = useState(initial);
   const [invalid, setInvalid] = useState(false);
-  const large = size === "lg";
 
   function submit() {
     const route = parseRepoInput(value);
@@ -23,43 +23,37 @@ export function RepoInput({ initial = "", onOpen, size = "md", autoFocus }: Repo
 
   return (
     <form
+      className={className}
       onSubmit={(e) => {
         e.preventDefault();
         submit();
       }}
-      className={clsx(
-        "group flex items-center gap-2 bg-white ring-1 transition focus-within:ring-2 dark:bg-zinc-900",
-        invalid ? "ring-cherry-400" : "ring-zinc-200 focus-within:ring-cherry-500 dark:ring-zinc-800",
-        large ? "h-14 rounded-2xl pr-2 pl-5 shadow-lg shadow-zinc-900/5" : "h-9 rounded-lg pr-1 pl-3",
-      )}
     >
-      <Search className={clsx("shrink-0 text-zinc-400", large ? "size-5" : "size-3.5")} />
-      <input
-        autoFocus={autoFocus}
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-          setInvalid(false);
-        }}
-        placeholder={large ? "Paste a GitHub repo, branch or compare URL" : "owner/repo"}
-        spellCheck={false}
+      <div
         className={clsx(
-          "min-w-0 flex-1 bg-transparent font-mono outline-none placeholder:font-sans placeholder:text-zinc-400",
-          large ? "text-base" : "text-[13px]",
-        )}
-      />
-      <button
-        type="submit"
-        aria-label="Open"
-        className={clsx(
-          "flex shrink-0 items-center justify-center rounded-lg transition",
-          large
-            ? "size-10 bg-cherry-600 text-white hover:bg-cherry-700"
-            : "size-7 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
+          "flex h-10 items-center gap-2 rounded border pr-1.5 pl-3 transition-colors focus-within:border-ink",
+          invalid ? "border-err" : "border-line-strong",
         )}
       >
-        <ArrowRight className={large ? "size-5" : "size-3.5"} />
-      </button>
+        <input
+          autoFocus={autoFocus}
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setInvalid(false);
+          }}
+          onKeyDown={(e) => e.key === "Escape" && onCancel?.()}
+          placeholder="github.com/owner/repo or a compare URL"
+          spellCheck={false}
+          aria-label="GitHub repository or URL"
+          aria-invalid={invalid}
+          className="min-w-0 flex-1 bg-transparent font-mono text-[13px] outline-none"
+        />
+        <Button type="submit" variant="secondary" size="md">
+          Open ↵
+        </Button>
+      </div>
+      {invalid && <p className="mt-2 text-xs text-err">That doesn't look like a GitHub repository.</p>}
     </form>
   );
 }

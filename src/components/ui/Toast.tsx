@@ -1,6 +1,5 @@
 import { clsx } from "clsx";
-import { CheckCircle2, CircleAlert, Info, X } from "lucide-react";
-import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useState } from "react";
 
 type ToastKind = "success" | "error" | "info";
 interface ToastItem {
@@ -13,8 +12,7 @@ const ToastContext = createContext<(message: ReactNode, kind?: ToastKind) => voi
 
 export const useToast = () => useContext(ToastContext);
 
-const icons = { success: CheckCircle2, error: CircleAlert, info: Info };
-const tones = { success: "text-emerald-500", error: "text-cherry-500", info: "text-sky-500" };
+const dots: Record<ToastKind, string> = { success: "bg-ok", error: "bg-err", info: "bg-ink-3" };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -25,38 +23,34 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (message: ReactNode, kind: ToastKind = "info") => {
       const id = Date.now() + Math.random();
       setToasts((all) => [...all.slice(-2), { id, kind, message }]);
-      setTimeout(() => dismiss(id), kind === "error" ? 8000 : 4500);
+      setTimeout(() => dismiss(id), kind === "error" ? 8000 : 4000);
     },
     [dismiss],
   );
 
-  const value = useMemo(() => show, [show]);
-
   return (
-    <ToastContext.Provider value={value}>
+    <ToastContext.Provider value={show}>
       {children}
-      <div className="pointer-events-none fixed bottom-5 left-1/2 z-50 flex w-full max-w-md -translate-x-1/2 flex-col gap-2 px-4">
-        {toasts.map((toast) => {
-          const Icon = icons[toast.kind];
-          return (
-            <div
-              key={toast.id}
-              className="pointer-events-auto flex animate-slide-up items-start gap-3 rounded-xl bg-white px-4 py-3 text-sm shadow-lg ring-1 shadow-zinc-900/10 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
-            >
-              <Icon className={clsx("mt-px size-4 shrink-0", tones[toast.kind])} />
-              <div className="min-w-0 flex-1 text-zinc-700 dark:text-zinc-200">{toast.message}</div>
+      <output aria-live="polite" className="pointer-events-none fixed bottom-4 left-4 z-50 flex w-80 flex-col gap-2">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className="group pointer-events-auto flex animate-fade-in items-center gap-2.5 rounded border border-line-strong bg-panel px-3 py-2"
+          >
+            <span className={clsx("size-1.5 shrink-0 rounded-full", dots[toast.kind])} />
+            <span className="min-w-0 flex-1">{toast.message}</span>
+            {toast.kind === "error" && (
               <button
                 type="button"
                 onClick={() => dismiss(toast.id)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-                aria-label="Dismiss"
+                className="text-xs text-ink-3 opacity-0 transition group-hover:opacity-100 hover:text-ink"
               >
-                <X className="size-4" />
+                Dismiss
               </button>
-            </div>
-          );
-        })}
-      </div>
+            )}
+          </div>
+        ))}
+      </output>
     </ToastContext.Provider>
   );
 }
